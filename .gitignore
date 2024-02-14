@@ -25,7 +25,7 @@ __pycache__/
 .idea
 *.log
 *.bak
-
+*.out
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

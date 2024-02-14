@@ -3,7 +3,7 @@ metric_best: mae
 metric_agg: argmin
 wandb:
   use: True
-  project: ZINC
+  project: CGT
 dataset:
   format: PyG-ZINC
   name: subset

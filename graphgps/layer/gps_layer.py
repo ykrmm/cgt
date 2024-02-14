@@ -6,7 +6,7 @@ import torch_geometric.nn as pygnn
 from performer_pytorch import SelfAttention
 from torch_geometric.data import Batch
 from torch_geometric.nn import Linear as Linear_pyg
-from torch_geometric.utils import to_dense_batch
+from torch_geometric.utils import to_dense_batch, to_dense_adj
 
 from graphgps.layer.bigbird_layer import SingleBigBirdLayer
 from graphgps.layer.gatedgcn_layer import GatedGCNLayer
@@ -32,7 +32,7 @@ class GPSLayer(nn.Module):
         self.equivstable_pe = equivstable_pe
         self.activation = register.act_dict[act]
 
-        self.log_attn_weights = log_attn_weights
+        self.log_attn_weights = True
         if log_attn_weights and global_model_type not in ['Transformer',
                                                           'BiasedTransformer']:
             raise NotImplementedError(
@@ -194,11 +194,14 @@ class GPSLayer(nn.Module):
                 h_local = self.norm1_local(h_local)
             h_out_list.append(h_local)
 
-        # Multi-head attention.
+        # Multi-head attention. Here Get the attention weights 
         if self.self_attn is not None:
             h_dense, mask = to_dense_batch(h, batch.batch)
+            adj = to_dense_adj(batch.edge_index,batch.batch)
             if self.global_model_type == 'Transformer':
-                h_attn = self._sa_block(h_dense, None, ~mask)[mask]
+                h_attn, A = self._sa_block(h_dense, None, ~mask)
+                h_attn = h_attn[mask]
+                loss_reg = self.loss_cgt(adj,A)
             elif self.global_model_type == 'BiasedTransformer':
                 # Use Graphormer-like conditioning, requires `batch.attn_bias`.
                 h_attn = self._sa_block(h_dense, batch.attn_bias, ~mask)[mask]
@@ -247,9 +250,32 @@ class GPSLayer(nn.Module):
                                   key_padding_mask=key_padding_mask,
                                   need_weights=True,
                                   average_attn_weights=False)
+            
             self.attn_weights = A.detach().cpu()
-        return x
+            
+        return x, A
 
+    def loss_cgt(self ,adj, A, margin=0.2):
+        n = adj.shape[2]
+        adj = adj.unsqueeze(1).repeat(1, self.num_heads, 1, 1)
+        deg = adj.sum(-1)
+        deg = deg.unsqueeze(3).repeat(1,1,1,n)
+        # flatten the tensor
+        deg = deg.view(-1)
+        adj = adj.view(-1)
+        A = A.view(-1)
+        # get the indices of the non-zero elements of the adj matrix
+        indices = torch.nonzero(adj)
+        tgt_attn = A[indices].squeeze()
+        # get the constraint vector
+        cstr = torch.ones_like(deg) / deg
+        cstr[cstr==np.inf] = 0
+        cstr = (cstr - margin)[indices].squeeze()
+        # compute loss
+        loss_reg = nn.functional.relu(cstr - tgt_attn)
+        return loss_reg
+    
+    
     def _ff_block(self, x):
         """Feed Forward block.
         """
