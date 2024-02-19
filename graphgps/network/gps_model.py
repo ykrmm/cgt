@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch_geometric.graphgym.register as register
 from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.models.gnn import GNNPreMP
@@ -8,7 +9,7 @@ from torch_geometric.graphgym.register import register_network
 
 from graphgps.layer.gps_layer import GPSLayer
 
-
+    
 class FeatureEncoder(torch.nn.Module):
     """
     Encoding node and edge features
@@ -103,18 +104,19 @@ class GPSModel(torch.nn.Module):
         self.post_mp = GNNHead(dim_in=cfg.gnn.dim_inner, dim_out=dim_out)
 
     def forward(self, batch):
+        # CGT Regularization
         if cfg.cgt.use:
             tot_loss_reg = 0
-            cpt = 0
             for module in self.children():
-                batch, loss_reg = module(batch)
-                tot_loss_reg += loss_reg
-                cpt += 1
-            
+                if module.__class__.__name__ == 'Sequential':
+                    batch, loss_reg = module((batch,tot_loss_reg))
+                    tot_loss_reg += loss_reg
+                else:
+                    batch = module(batch)
             if cfg.cgt.agg == 'mean':
-                tot_loss_reg = tot_loss_reg / cpt
-
+                tot_loss_reg = tot_loss_reg / cfg.gt.layers
             return batch, tot_loss_reg
+        # Only forward pass
         else:
             for module in self.children():
                 batch = module(batch)

@@ -21,7 +21,8 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
         batch.split = 'train'
         batch.to(torch.device(cfg.accelerator))
         if cfg.cgt.use:
-            pred, true, loss_reg = model(batch)
+            batch, loss_reg = model(batch)
+            pred, true = batch
         else:
             pred, true = model(batch)
 
@@ -31,9 +32,9 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
             _pred = pred_score
         else:
             if cfg.cgt.use:
-                loss, pred_score = compute_loss(pred, true)
+                loss, pred_score = compute_loss((pred, true), loss_reg)
             else:
-                loss, pred_score = compute_loss(pred, true, loss_reg)
+                loss, pred_score = compute_loss(pred, true)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
         loss.backward()

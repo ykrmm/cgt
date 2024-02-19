@@ -155,7 +155,9 @@ class GPSLayer(nn.Module):
         self.ff_dropout2 = nn.Dropout(dropout)
 
     def forward(self, batch):
-        h = batch.x
+        if type(batch)  is tuple:
+            batch, loss_reg_tot = batch
+        h = batch.x    
         h_in1 = h  # for first residual connection
 
         h_out_list = []
@@ -203,8 +205,8 @@ class GPSLayer(nn.Module):
             if self.global_model_type == 'Transformer':
                 output = self._sa_block(h_dense, None, ~mask)
                 if cfg.cgt.use: # Apply a constraint on attention factor
-                    h_attn, A = output
-                    loss_reg = soft_cgt_loss(adj, A)
+                    h_attn, attn= output
+                    loss_reg = soft_cgt_loss(adj, attn)
                 else:
                     h_attn = output
                 h_attn = h_attn[mask]
@@ -241,7 +243,7 @@ class GPSLayer(nn.Module):
         batch.x = h
         
         if cfg.cgt.use:
-            return batch, loss_reg
+            return batch, loss_reg_tot + loss_reg
         else:
             return batch
 
