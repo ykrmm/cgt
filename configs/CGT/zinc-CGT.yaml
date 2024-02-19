@@ -4,6 +4,7 @@ metric_agg: argmin
 wandb:
   use: True
   project: CGT
+  name: zinc-CGT
 dataset:
   format: PyG-ZINC
   name: subset
@@ -32,7 +33,7 @@ train:
   ckpt_period: 100
 model:
   type: GPSModel
-  loss_fun: cgt+l1
+  loss_fun: l1
   edge_decoding: dot
   graph_pooling: add
 gt:

@@ -31,12 +31,11 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
             _true = true
             _pred = pred_score
         else:
-            if cfg.cgt.use:
-                loss, pred_score = compute_loss((pred, true), loss_reg)
-            else:
-                loss, pred_score = compute_loss(pred, true)
+            loss, pred_score = compute_loss(pred, true)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
+        if cfg.cgt.use:
+            loss = loss + cfg.cgt.lamb * loss_reg
         loss.backward()
         # Parameters update after accumulating gradients for given num. batches.
         if ((iter + 1) % batch_accumulation == 0) or (iter + 1 == len(loader)):
@@ -66,7 +65,8 @@ def eval_epoch(logger, loader, model, split='val'):
             pred, true, extra_stats = model(batch)
         else:
             if cfg.cgt.use:
-                pred, true, loss_reg = model(batch)
+                batch, loss_reg = model(batch)
+                pred, true = batch
             else:
                 pred, true = model(batch)
             extra_stats = {}
@@ -75,12 +75,12 @@ def eval_epoch(logger, loader, model, split='val'):
             _true = true
             _pred = pred_score
         else:
-            if cfg.cgt.use:
-                loss, pred_score = compute_loss(pred, true, loss_reg)
-            else:
-                loss, pred_score = compute_loss(pred, true)
+            loss, pred_score = compute_loss(pred, true)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
+        if cfg.cgt.use:
+            loss = loss + cfg.cgt.lamb * loss_reg
+            
         logger.update_stats(true=_true,
                             pred=_pred,
                             loss=loss.detach().cpu().item(),
