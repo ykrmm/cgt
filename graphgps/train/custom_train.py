@@ -20,13 +20,20 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
     for iter, batch in enumerate(loader):
         batch.split = 'train'
         batch.to(torch.device(cfg.accelerator))
-        pred, true = model(batch)
+        if cfg.cgt.use:
+            pred, true, loss_reg = model(batch)
+        else:
+            pred, true = model(batch)
+
         if cfg.dataset.name == 'ogbg-code2':
             loss, pred_score = subtoken_cross_entropy(pred, true)
             _true = true
             _pred = pred_score
         else:
-            loss, pred_score = compute_loss(pred, true)
+            if cfg.cgt.use:
+                loss, pred_score = compute_loss(pred, true)
+            else:
+                loss, pred_score = compute_loss(pred, true, loss_reg)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
         loss.backward()
@@ -57,14 +64,20 @@ def eval_epoch(logger, loader, model, split='val'):
         if cfg.gnn.head == 'inductive_edge':
             pred, true, extra_stats = model(batch)
         else:
-            pred, true = model(batch)
+            if cfg.cgt.use:
+                pred, true, loss_reg = model(batch)
+            else:
+                pred, true = model(batch)
             extra_stats = {}
         if cfg.dataset.name == 'ogbg-code2':
             loss, pred_score = subtoken_cross_entropy(pred, true)
             _true = true
             _pred = pred_score
         else:
-            loss, pred_score = compute_loss(pred, true)
+            if cfg.cgt.use:
+                loss, pred_score = compute_loss(pred, true, loss_reg)
+            else:
+                loss, pred_score = compute_loss(pred, true)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
         logger.update_stats(true=_true,

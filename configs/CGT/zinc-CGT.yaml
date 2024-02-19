@@ -32,7 +32,7 @@ train:
   ckpt_period: 100
 model:
   type: GPSModel
-  loss_fun: l1
+  loss_fun: cgt+l1
   edge_decoding: dot
   graph_pooling: add
 gt:
@@ -62,7 +62,6 @@ optim:
   max_epoch: 2000
   scheduler: cosine_with_warmup
   num_warmup_epochs: 50
-
 cgt:
   use: True
   soft: True
