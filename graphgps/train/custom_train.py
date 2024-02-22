@@ -47,6 +47,7 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
         logger.update_stats(true=_true,
                             pred=_pred,
                             loss=loss.detach().cpu().item(),
+                            loss_reg=loss_reg.detach().cpu().item() if cfg.cgt.use else 0,
                             lr=scheduler.get_last_lr()[0],
                             time_used=time.time() - time_start,
                             params=cfg.params,
@@ -84,6 +85,7 @@ def eval_epoch(logger, loader, model, split='val'):
         logger.update_stats(true=_true,
                             pred=_pred,
                             loss=loss.detach().cpu().item(),
+                            loss_reg=loss_reg.detach().cpu().item() if cfg.cgt.use else 0,
                             lr=0, time_used=time.time() - time_start,
                             params=cfg.params,
                             dataset_name=cfg.dataset.name,
@@ -181,6 +183,8 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
                     bstats = {"best/epoch": best_epoch}
                     for i, s in enumerate(['train', 'val', 'test']):
                         bstats[f"best/{s}_loss"] = perf[i][best_epoch]['loss']
+                        if cfg.cgt.use: 
+                            bstats[f"best/{s}_loss_reg"] = perf[i][best_epoch]['loss_reg']
                         if m in perf[i][best_epoch]:
                             bstats[f"best/{s}_{m}"] = perf[i][best_epoch][m]
                             run.summary[f"best_{s}_perf"] = \
