@@ -207,9 +207,11 @@ class GPSLayer(nn.Module):
                 if cfg.cgt.use: # Apply a constraint on attention factor
                     h_attn, attn= output
                     loss_reg = soft_cgt_loss(adj, attn)
+                    h_attn = h_attn[mask]
                 else:
-                    h_attn = output
-                h_attn = h_attn[mask]
+                    h_attn, _= output
+                    h_attn = h_attn[mask]
+                
                 
             elif self.global_model_type == 'BiasedTransformer':
                 # Use Graphormer-like conditioning, requires `batch.attn_bias`.
@@ -265,8 +267,7 @@ class GPSLayer(nn.Module):
                                   average_attn_weights=False)
             
             self.attn_weights = A.detach().cpu()
-            
-        return x, A
+        return x,A
 
     def _ff_block(self, x):
         """Feed Forward block.

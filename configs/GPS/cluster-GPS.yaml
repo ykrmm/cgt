@@ -2,7 +2,7 @@ out_dir: results
 metric_best: accuracy-SBM
 wandb:
   use: True
-  project: CLUSTER
+  project: CGT
 dataset:
   format: PyG-GNNBenchmarkDataset
   name: CLUSTER

@@ -2,7 +2,7 @@ out_dir: results
 metric_best: accuracy-SBM
 wandb:
   use: True
-  project: PATTERN
+  project: CGT
 dataset:
   format: PyG-GNNBenchmarkDataset
   name: PATTERN

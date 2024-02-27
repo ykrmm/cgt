@@ -15,7 +15,7 @@ def set_cfg_wandb(cfg):
     cfg.cgt.use = False
 
     # Use the soft reg (i.e only on non-zero elements of the adj matrix)
-    cfg.cgt.soft = True
+    cfg.cgt.soft = False
 
     # Margin constraint for the loss
     cfg.cgt.margin = 0.1
