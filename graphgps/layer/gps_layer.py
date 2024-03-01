@@ -12,7 +12,7 @@ from torch_geometric.graphgym.config import cfg
 from graphgps.layer.bigbird_layer import SingleBigBirdLayer
 from graphgps.layer.gatedgcn_layer import GatedGCNLayer
 from graphgps.layer.gine_conv_layer import GINEConvESLapPE
-from graphgps.loss.cgt import soft_cgt_loss
+from graphgps.loss.cgt import cgt_loss
 
 
 class GPSLayer(nn.Module):
@@ -206,11 +206,10 @@ class GPSLayer(nn.Module):
                 output = self._sa_block(h_dense, None, ~mask)
                 if cfg.cgt.use: # Apply a constraint on attention factor
                     h_attn, attn= output
-                    loss_reg = soft_cgt_loss(adj, attn)
-                    h_attn = h_attn[mask]
+                    loss_reg = cgt_loss(adj, attn)
                 else:
                     h_attn, _= output
-                    h_attn = h_attn[mask]
+                h_attn = h_attn[mask]
                 
                 
             elif self.global_model_type == 'BiasedTransformer':

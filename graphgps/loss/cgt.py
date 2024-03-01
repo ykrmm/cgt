@@ -3,6 +3,15 @@ import torch.nn as nn
 from torch_geometric.graphgym.config import cfg
 import numpy as np
 
+
+
+def cgt_loss(adj, attn):
+        if cfg.cgt.mode == 'soft':
+                return soft_cgt_loss(adj, attn)
+        elif cfg.cgt.mode == 'quantity':
+                return quantity_loss(adj, attn)
+        else:
+                raise ValueError(f"Unexpected mode: {cfg.cgt.mode}")
         
 def soft_cgt_loss(adj, attn):
         margin = cfg.cgt.margin
