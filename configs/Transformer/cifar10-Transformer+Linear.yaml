@@ -3,7 +3,7 @@ metric_best: accuracy
 wandb:
   use: True
   project: CGT
-  name: CIFAR10-CGT-Quantity
+  name: CIFAR10-Transformer-LinearNode
 dataset:
   format: PyG-GNNBenchmarkDataset
   name: CIFAR10
@@ -11,21 +11,11 @@ dataset:
   task_type: classification
   transductive: False
   node_encoder: True
-  node_encoder_name: LapPE
+  node_encoder_name: LinearNode
   node_encoder_bn: False
   edge_encoder: True
   edge_encoder_name: LinearEdge
   edge_encoder_bn: False
-posenc_LapPE:
-  enable: True
-  eigen:
-    laplacian_norm: none
-    eigvec_norm: L2
-    max_freqs: 8
-  model: DeepSet
-  dim_pe: 8
-  layers: 2
-  raw_norm_type: none
 train:
   mode: custom
   batch_size: 16
@@ -37,7 +27,7 @@ model:
   edge_decoding: dot
   graph_pooling: mean
 gt:  # Hyperparameters optimized for ~100k budget.
-  layer_type: CustomGatedGCN+Transformer
+  layer_type: None+Transformer
   layers: 3
   n_heads: 4
   dim_hidden: 52  # `gt.dim_hidden` must match `gnn.dim_inner`
@@ -63,9 +53,3 @@ optim:
   max_epoch: 100
   scheduler: cosine_with_warmup
   num_warmup_epochs: 5
-cgt:
-  use: True
-  mode: quantity
-  margin: 0.2 
-  lamb: 1. 
-  agg: mean

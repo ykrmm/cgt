@@ -37,6 +37,7 @@ def soft_cgt_loss(adj, attn):
         return loss_reg
 
 def quantity_loss(adj,attn):
+        # Il faut faire la somme par tête et moyenné
         margin = cfg.cgt.margin
         n = adj.shape[2]
         adj = adj.unsqueeze(1).repeat(1, cfg.gt.n_heads, 1, 1)

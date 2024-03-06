@@ -3,6 +3,7 @@ metric_best: accuracy
 wandb:
   use: True
   project: CGT
+  name: CIFAR10-CGT-Soft-Best
 dataset:
   format: PyG-GNNBenchmarkDataset
   name: CIFAR10
@@ -62,3 +63,9 @@ optim:
   max_epoch: 100
   scheduler: cosine_with_warmup
   num_warmup_epochs: 5
+cgt:
+  use: True
+  mode: soft
+  margin: 0.2 
+  lamb: 5. 
+  agg: mean
