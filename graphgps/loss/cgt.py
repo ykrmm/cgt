@@ -37,13 +37,12 @@ def soft_cgt_loss(adj, attn):
         return loss_reg
 
 def quantity_loss(adj,attn):
-        # Il faut faire la somme par tête et moyenné
-        
         margin = cfg.cgt.margin
         n = adj.shape[2]
         adj = adj.unsqueeze(1).repeat(1, cfg.gt.n_heads, 1, 1)
         deg = adj.sum(-1)
         deg = deg.unsqueeze(3).repeat(1,1,1,n)
+        import ipdb; ipdb.set_trace()
         # flatten the tensor
         deg = deg.view(-1)
         adj = adj.view(-1)
