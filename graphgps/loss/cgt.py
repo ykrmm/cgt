@@ -38,6 +38,7 @@ def soft_cgt_loss(adj, attn):
 
 def quantity_loss(adj,attn):
         # Il faut faire la somme par tête et moyenné
+        
         margin = cfg.cgt.margin
         n = adj.shape[2]
         adj = adj.unsqueeze(1).repeat(1, cfg.gt.n_heads, 1, 1)
@@ -50,11 +51,16 @@ def quantity_loss(adj,attn):
         # get the indices of the non-zero elements of the adj matrix
         indices = torch.nonzero(adj)
         tgt_attn = attn[indices].squeeze()
+        deg = deg[indices].squeeze()
+        tgt_attn = tgt_attn.reshape((cfg.gt.n_heads,int(len(indices)/cfg.gt.n_heads)))
+        deg = deg.reshape((cfg.gt.n_heads,int(len(indices)/cfg.gt.n_heads)))
         # get the constraint vector
-        cstr = torch.ones_like(deg) / deg
+        
+        cstr = torch.ones_like(tgt_attn) / deg
         cstr[cstr==np.inf] = 0
-        cstr = (cstr - margin)[indices].squeeze()
+        
+        cstr = (cstr - margin)
         # compute loss
-        loss_reg = nn.functional.relu(cstr.sum() - tgt_attn.sum())
+        loss_reg = nn.functional.relu(cstr.sum(dim=1) - tgt_attn.sum(dim=1)).mean()
         return loss_reg
     
