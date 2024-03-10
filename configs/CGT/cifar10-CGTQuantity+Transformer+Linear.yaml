@@ -3,7 +3,7 @@ metric_best: accuracy
 wandb:
   use: True
   project: CGT
-  name: CIFAR10-CGT+Transformer-Linear
+  name: CIFAR10-CGTQuantity+Transformer-Linear
 dataset:
   format: PyG-GNNBenchmarkDataset
   name: CIFAR10
@@ -56,6 +56,6 @@ optim:
 cgt:
   use: True
   mode: quantity
-  margin: 0.
-  lamb: 5. 
+  margin: 0.03
+  lamb: 0.1 
   agg: mean
