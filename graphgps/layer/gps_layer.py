@@ -155,8 +155,15 @@ class GPSLayer(nn.Module):
         self.ff_dropout2 = nn.Dropout(dropout)
 
     def forward(self, batch):
+        # CGT Regularization setup
         if type(batch)  is tuple:
             batch, loss_reg_tot = batch
+            compute_cgt = True
+            if cfg.cgt.first: 
+                if loss_reg_tot > 0 : # It means that the first layer has already computed the cgt loss
+                    compute_cgt = False
+            
+        # Forward pass
         h = batch.x    
         h_in1 = h  # for first residual connection
 
@@ -204,7 +211,7 @@ class GPSLayer(nn.Module):
             adj = to_dense_adj(batch.edge_index,batch.batch)
             if self.global_model_type == 'Transformer':
                 output = self._sa_block(h_dense, None, ~mask)
-                if cfg.cgt.use: # Apply a constraint on attention factor
+                if compute_cgt: # Apply a constraint on attention factor
                     h_attn, attn= output
                     loss_reg = cgt_loss(adj, attn)
                 else:
@@ -244,7 +251,10 @@ class GPSLayer(nn.Module):
         batch.x = h
         
         if cfg.cgt.use:
-            return batch, loss_reg_tot + loss_reg
+            if compute_cgt:
+                return batch, loss_reg_tot + loss_reg
+            else: # If we don't compute it we only pass the precedent layer loss
+                return batch, loss_reg_tot
         else:
             return batch
 

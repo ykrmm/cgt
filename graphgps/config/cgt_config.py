@@ -25,3 +25,6 @@ def set_cfg_wandb(cfg):
     
     # Batch aggregation methos
     cfg.cgt.agg = 'mean'
+    
+    # Constraint only the first layer
+    cfg.cgt.first = False

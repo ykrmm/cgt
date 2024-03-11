@@ -106,15 +106,17 @@ class GPSModel(torch.nn.Module):
     def forward(self, batch):
         # CGT Regularization
         if cfg.cgt.use:
-            tot_loss_reg = 0
+            tot_loss_reg = 0.
             for module in self.children():
                 if module.__class__.__name__ == 'Sequential':
-                    batch, loss_reg = module((batch,tot_loss_reg))
-                    tot_loss_reg += loss_reg
+                        batch, loss_reg = module((batch,tot_loss_reg))
+                        tot_loss_reg += loss_reg
                 else:
                     batch = module(batch)
-            if cfg.cgt.agg == 'mean':
+
+            if cfg.cgt.agg == 'mean' and not cfg.cgt.first:
                 tot_loss_reg = tot_loss_reg / cfg.gt.layers
+
             return batch, tot_loss_reg
         # Only forward pass
         else:
