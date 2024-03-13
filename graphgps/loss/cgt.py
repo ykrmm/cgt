@@ -10,6 +10,8 @@ def cgt_loss(adj, attn):
                 return soft_cgt_loss(adj, attn)
         elif cfg.cgt.mode == 'quantity':
                 return quantity_loss(adj, attn)
+        elif cfg.cgt.mode == 'min_attn':
+                return min_attn(adj, attn)
         else:
                 raise ValueError(f"Unexpected mode: {cfg.cgt.mode}")
         
@@ -34,6 +36,18 @@ def soft_cgt_loss(adj, attn):
         loss_reg = nn.functional.relu(cstr - tgt_attn)
         # Sum ? Mean ? 
         loss_reg = loss_reg.mean()
+        return loss_reg
+
+def min_attn(adj,attn):
+        adj = adj.unsqueeze(1).repeat(1, cfg.gt.n_heads, 1, 1)
+        # flatten the tensor
+        adj = adj.view(-1)
+        attn = attn.view(-1)
+        # get the indices of the non-zero elements of the adj matrix
+        indices = torch.nonzero(adj)
+        tgt_attn = attn[indices].squeeze()
+        # compute loss
+        loss_reg = - tgt_attn.mean()
         return loss_reg
 
 def quantity_loss(adj,attn):

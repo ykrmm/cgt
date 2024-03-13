@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG=CGT/cifar10-CGTSoft+Transformer+Linear
+CONFIG=CGT/cifar10-CGTSoftFirstLayer+Transformer+Linear
 GRID=CGT/grid_cgt_soft
 REPEAT=1
 MAX_JOBS=4
