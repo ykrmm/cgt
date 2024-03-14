@@ -156,6 +156,7 @@ class GPSLayer(nn.Module):
 
     def forward(self, batch):
         # CGT Regularization setup
+        compute_cgt = False
         if type(batch)  is tuple:
             batch, loss_reg_tot = batch
             compute_cgt = True
