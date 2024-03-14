@@ -3,7 +3,7 @@ metric_best: accuracy-SBM
 wandb:
   use: True
   project: CGT
-  name: CLUSTER-GPS-ESLapPE
+  name: CLUSTER-CGTSoft+GPS+ESLapPE
 dataset:
   format: PyG-GNNBenchmarkDataset
   name: CLUSTER
@@ -70,3 +70,9 @@ optim:
   max_epoch: 100
   scheduler: cosine_with_warmup
   num_warmup_epochs: 5
+cgt:
+  use: True
+  mode: soft
+  margin: 0.01
+  lamb: 5. 
+  agg: mean
