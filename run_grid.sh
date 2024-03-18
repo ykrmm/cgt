@@ -1,6 +1,6 @@
-CONFIG_DIR=/users/k/karmimy/These/cgt/configs/cifar10-CGTMinAttn+Transformer+Linear_grid_grid_cgt_soft
+CONFIG_DIR=/users/k/karmimy/These/cgt/configs/cluster-CGTSoft+GPS+Linear_grid_grid_cgt_soft
 REPEAT=1
-MAX_JOBS=6
+MAX_JOBS=2
 MAIN=${4:-main}
 (
   trap 'kill 0' SIGINT

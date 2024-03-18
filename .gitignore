@@ -160,3 +160,5 @@ dmypy.json
 *.swp
 
 
+gen_grid.sh 
+run_grid.sh

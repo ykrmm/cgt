@@ -73,6 +73,6 @@ optim:
 cgt:
   use: True
   mode: soft
-  margin: 0.01
-  lamb: 5. 
+  margin: 0.
+  lamb: 10. 
   agg: mean
