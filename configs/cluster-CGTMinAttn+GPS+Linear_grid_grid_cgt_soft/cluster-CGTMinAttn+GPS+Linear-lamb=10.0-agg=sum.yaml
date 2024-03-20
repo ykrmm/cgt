@@ -1,0 +1,61 @@
+cgt:
+  agg: sum
+  lamb: 10.0
+  margin: 0.01
+  mode: min_attn
+  use: true
+dataset:
+  edge_encoder: true
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-GNNBenchmarkDataset
+  name: CLUSTER
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: LinearNode
+  split_mode: standard
+  task: graph
+  task_type: classification
+  transductive: false
+gnn:
+  act: relu
+  agg: mean
+  batchnorm: true
+  dim_inner: 48
+  dropout: 0.0
+  head: inductive_node
+  layers_post_mp: 3
+  layers_pre_mp: 0
+  normalize_adj: false
+gt:
+  attn_dropout: 0.5
+  batch_norm: true
+  dim_hidden: 48
+  dropout: 0.1
+  layer_norm: false
+  layer_type: CustomGatedGCN+Transformer
+  layers: 16
+  n_heads: 8
+metric_best: accuracy-SBM
+model:
+  edge_decoding: dot
+  loss_fun: weighted_cross_entropy
+  type: GPSModel
+optim:
+  base_lr: 0.0005
+  clip_grad_norm: true
+  max_epoch: 100
+  num_warmup_epochs: 5
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 1e-5
+out_dir: results/cluster-CGTMinAttn+GPS+Linear_grid_grid_cgt_soft
+train:
+  batch_size: 16
+  ckpt_period: 100
+  eval_period: 1
+  mode: custom
+wandb:
+  name: CLUSTER-CGTMinAttn+GPS+Linear
+  project: CGT
+  use: true

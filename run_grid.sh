@@ -1,6 +1,6 @@
-CONFIG_DIR=/users/k/karmimy/These/cgt/configs/cluster-CGTSoft+GPS+Linear_grid_grid_cgt_soft
+CONFIG_DIR=/users/k/karmimy/These/cgt/configs/cluster-CGTMinAttn+GPS+Linear_grid_grid_cgt_soft
 REPEAT=1
-MAX_JOBS=2
+MAX_JOBS=3
 MAIN=${4:-main}
 (
   trap 'kill 0' SIGINT

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG=CGT/cluster-CGTSoft+GPS+Linear
+CONFIG=CGT/cluster-CGTMinAttn+GPS+Linear
 GRID=CGT/grid_cgt_soft
 REPEAT=1
 MAX_JOBS=3
