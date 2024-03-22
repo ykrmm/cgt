@@ -4,7 +4,7 @@ metric_agg: argmin
 wandb:
   use: True
   project: CGT
-  name: ZINC-GPS-Linear
+  name: ZINC-CGTMinAttn+Transformer+Linear
 dataset:
   format: PyG-ZINC
   name: subset
@@ -30,7 +30,7 @@ model:
   edge_decoding: dot
   graph_pooling: add
 gt:
-  layer_type: GINE+Transformer  # CustomGatedGCN+Performer
+  layer_type: None+Transformer  # CustomGatedGCN+Performer
   layers: 10
   n_heads: 4
   dim_hidden: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
@@ -56,3 +56,9 @@ optim:
   max_epoch: 2000
   scheduler: cosine_with_warmup
   num_warmup_epochs: 50
+cgt:
+  use: True
+  mode: min_attn
+  margin: 0.01
+  lamb: 5. 
+  agg: mean
